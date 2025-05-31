@@ -53,20 +53,23 @@ export default function LiveStream({ streamId }: LiveStreamProps) {
         />
         
         {/* Stream Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40">
           {/* Top Overlay */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-            <Card className="bg-black/70 backdrop-blur-sm border-0 p-3">
-              <div className="flex items-center space-x-2 text-sm">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                <span className="font-medium">LIVE</span>
-                <span className="text-secondary">•</span>
-                <Eye className="w-4 h-4" />
-                <span className="text-secondary">{stream?.viewerCount || 1247} viewers</span>
+          <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
+            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
+              <div className="flex items-center space-x-3 text-sm mb-2">
+                <div className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 px-3 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                  <span className="font-bold text-white">LIVE</span>
+                </div>
+                <div className="flex items-center space-x-2 text-white/80">
+                  <Eye className="w-4 h-4" />
+                  <span className="font-medium">{stream?.viewerCount || 1247}</span>
+                </div>
               </div>
-              <div className="mt-1">
-                <div className="font-semibold">{stream?.title || "Basketball at Downtown Court"}</div>
-                <div className="text-sm text-secondary">{stream?.location?.name || "Manhattan, NYC"}</div>
+              <div>
+                <div className="font-bold text-lg text-white">{stream?.title || "Basketball at Downtown Court"}</div>
+                <div className="text-sm text-white/70">{stream?.location?.name || "Manhattan, NYC"}</div>
               </div>
             </Card>
             
@@ -81,31 +84,31 @@ export default function LiveStream({ streamId }: LiveStreamProps) {
           </div>
           
           {/* Bottom Overlay - Stats */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <Card className="bg-black/70 backdrop-blur-sm border-0 p-4">
+          <div className="absolute bottom-6 left-6 right-6">
+            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-6 shadow-2xl">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-green">{stats.points}</div>
-                    <div className="text-xs text-secondary">Points</div>
+                <div className="flex items-center space-x-8">
+                  <div className="text-center transform hover:scale-110 transition-all duration-300">
+                    <div className="text-3xl font-black text-accent-green mb-1">{stats.points}</div>
+                    <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Points</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-blue">{stats.time}</div>
-                    <div className="text-xs text-secondary">Duration</div>
+                  <div className="text-center transform hover:scale-110 transition-all duration-300">
+                    <div className="text-3xl font-black text-accent-blue mb-1">{stats.time}</div>
+                    <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Duration</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-orange">{stats.distance}</div>
-                    <div className="text-xs text-secondary">Miles</div>
+                  <div className="text-center transform hover:scale-110 transition-all duration-300">
+                    <div className="text-3xl font-black text-accent-orange mb-1">{stats.distance}</div>
+                    <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Miles</div>
                   </div>
                 </div>
                 
-                <div className="flex space-x-2">
-                  <Button className="bg-accent-green hover:bg-accent-green/80 text-white">
-                    <DollarSign className="w-4 h-4 mr-2" />
+                <div className="flex space-x-3">
+                  <Button className="bg-gradient-green hover:shadow-glow-green text-white font-semibold px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
+                    <DollarSign className="w-5 h-5 mr-2" />
                     Quick Bet
                   </Button>
-                  <Button className="bg-accent-blue hover:bg-accent-blue/80 text-white">
-                    <Share2 className="w-4 h-4 mr-2" />
+                  <Button className="bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue text-white font-semibold px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
+                    <Share2 className="w-5 h-5 mr-2" />
                     Share
                   </Button>
                 </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -69,45 +69,50 @@ export default function ChatPanel({ streamId, currentUser, onSendMessage, isConn
   }, [streamId]);
 
   return (
-    <div className="h-full bg-card border-l border-border flex flex-col">
+    <div className="h-full bg-glass backdrop-blur-xl border-l border-border/50 flex flex-col relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-accent-blue/5 via-transparent to-accent-purple/5 pointer-events-none"></div>
       {/* Chat Header */}
-      <div className="p-4 border-b border-border">
-        <CardTitle className="text-lg flex items-center space-x-2">
-          <MessageCircle className="w-5 h-5 text-accent-blue" />
-          <span>Live Chat</span>
-          <span className="bg-accent-green/20 text-accent-green text-xs px-2 py-1 rounded-full">
+      <div className="p-6 border-b border-border/50 relative z-10">
+        <CardTitle className="text-xl font-bold flex items-center space-x-3">
+          <div className="p-2 bg-gradient-to-r from-accent-blue to-accent-purple rounded-lg shadow-lg">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-accent-blue">Live Chat</span>
+          <span className="bg-accent-green/20 text-accent-green text-sm px-3 py-1 rounded-full font-semibold">
             {messages.length + 234}
           </span>
         </CardTitle>
       </div>
       
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto custom-scrollbar space-y-3">
+      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar space-y-4 relative z-10">
         {messages.map((message, index) => (
           <div 
             key={message.id || index} 
-            className={`rounded-lg p-3 animate-fade-in ${
+            className={`rounded-xl p-4 animate-slide-up backdrop-blur-sm shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
               message.type === 'bet_notification' ? 
-              'bg-accent-green/10 border border-accent-green/30' : 
-              'bg-background'
+              'bg-gradient-to-r from-accent-green/20 to-accent-blue/10 border border-accent-green/40 shadow-glow-green' : 
+              'bg-glass border border-white/10'
             }`}
           >
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-3">
                 {message.type === 'bet_notification' && (
-                  <Trophy className="w-4 h-4 text-accent-green" />
+                  <div className="p-1 bg-accent-green/20 rounded-full">
+                    <TrendingUp className="w-3 h-3 text-accent-green" />
+                  </div>
                 )}
-                <span className={`text-sm font-medium ${
+                <span className={`text-sm font-bold ${
                   message.type === 'bet_notification' ? 'text-accent-green' : 'text-accent-blue'
                 }`}>
                   {message.user?.username || 'Anonymous'}
                 </span>
               </div>
-              <span className="text-xs text-secondary">
+              <span className="text-xs text-secondary font-medium">
                 {new Date(message.createdAt).toLocaleTimeString()}
               </span>
             </div>
-            <div className="text-sm">{message.message}</div>
+            <div className="text-sm font-medium text-white">{message.message}</div>
           </div>
         ))}
         <div ref={messagesEndRef} />

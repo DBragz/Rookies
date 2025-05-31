@@ -80,74 +80,82 @@ export default function BettingPanel({ streamId, userId, onPlaceBet }: BettingPa
   const pendingBets = userBets?.filter((bet: any) => bet.status === 'pending') || [];
 
   return (
-    <div className="h-full bg-card p-4 overflow-y-auto custom-scrollbar">
-      <div className="space-y-4">
+    <div className="h-full bg-glass backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 via-transparent to-accent-orange/5 pointer-events-none"></div>
+      <div className="space-y-6 relative z-10">
         {/* Active Bets */}
-        <Card>
+        <Card className="bg-glass backdrop-blur-sm border-accent-green/20 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-accent-green" />
-              <span>Live Bets</span>
-              <span className="text-sm text-secondary">({pendingBets.length} active)</span>
+            <CardTitle className="text-xl font-bold flex items-center space-x-3">
+              <div className="p-2 bg-gradient-green rounded-lg shadow-glow-green">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-accent-green">Live Bets</span>
+              <span className="bg-accent-green/20 text-accent-green text-sm px-3 py-1 rounded-full font-semibold">
+                {pendingBets.length} active
+              </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {pendingBets.length > 0 ? (
               pendingBets.map((bet: any) => (
-                <div key={bet.id} className="bg-secondary rounded-lg p-3 border border-accent-green/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">{bet.description}</span>
-                    <span className="text-accent-green font-semibold">
+                <div key={bet.id} className="bg-gradient-to-r from-accent-green/10 to-accent-blue/10 rounded-xl p-4 border border-accent-green/30 backdrop-blur-sm shadow-lg animate-slide-up">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-base font-semibold">{bet.description}</span>
+                    <span className="text-accent-green font-black text-lg">
                       {bet.odds > 0 ? '+' : ''}{bet.odds}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-secondary">Bet: ${bet.amount}</span>
-                    <span className="text-accent-green">Win: ${bet.potentialWin}</span>
+                  <div className="flex items-center justify-between text-sm mb-3">
+                    <span className="text-secondary font-medium">Bet: ${bet.amount}</span>
+                    <span className="text-accent-green font-bold">Win: ${bet.potentialWin}</span>
                   </div>
-                  <div className="mt-2 bg-muted rounded-full h-1">
-                    <div className="bg-accent-green h-1 rounded-full w-4/5"></div>
+                  <div className="bg-muted/50 rounded-full h-2 overflow-hidden">
+                    <div className="bg-gradient-green h-2 rounded-full w-4/5 animate-pulse"></div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center text-secondary py-4">
-                No active bets
+              <div className="text-center text-secondary py-8 opacity-60">
+                <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <span className="text-lg">No active bets</span>
               </div>
             )}
           </CardContent>
         </Card>
         
         {/* Available Bets */}
-        <Card>
+        <Card className="bg-glass backdrop-blur-sm border-accent-orange/20 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center space-x-2">
-              <DollarSign className="w-5 h-5 text-accent-orange" />
-              <span>Hot Bets</span>
+            <CardTitle className="text-xl font-bold flex items-center space-x-3">
+              <div className="p-2 bg-gradient-orange rounded-lg shadow-lg">
+                <DollarSign className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-accent-orange">Hot Bets</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3">
             {betOptions?.map((option: any, index: number) => (
               <Button
                 key={index}
                 variant="ghost"
-                className="w-full bg-secondary hover:bg-muted/50 rounded-lg p-3 h-auto border border-border hover:border-accent-green/50 transition-colors"
+                className="w-full bg-gradient-to-r from-muted/50 to-muted/30 hover:from-accent-green/10 hover:to-accent-blue/10 rounded-xl p-4 h-auto border border-border/50 hover:border-accent-green/50 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-glow-green"
                 onClick={() => handlePlaceBet(option)}
                 disabled={placeBetMutation.isPending}
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="text-left">
-                    <div className="font-medium">{option.description}</div>
+                    <div className="font-semibold text-base">{option.description}</div>
                     <div className="text-sm text-secondary">{option.details}</div>
                   </div>
-                  <div className={`font-bold ${
+                  <div className={`font-black text-xl ${
                     option.odds > 0 ? 'text-accent-green' : 'text-accent-blue'
                   }`}>
                     {option.odds > 0 ? '+' : ''}{option.odds}
                   </div>
                 </div>
               </Button>
-            ))}
+            )) || []}
           </CardContent>
         </Card>
 
