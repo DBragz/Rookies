@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 15 17% 11%; /* #1A1D26 */
+  --foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+  --popover: 15 17% 11%;
+  --popover-foreground: 0 0% 98%;
+  --card: 15 17% 15%; /* #252A36 */
+  --card-foreground: 0 0% 98%;
+  --border: 0 0% 27%;
+  --input: 0 0% 27%;
+  --primary: 158 64% 52%; /* #00D632 */
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 158 64% 52%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 158 64% 52%;
+  --radius: 0.5rem;
+  
+  /* Custom sports betting colors */
+  --accent-green: 158 64% 52%; /* #00D632 */
+  --accent-blue: 210 100% 55%; /* #1E90FF */
+  --accent-orange: 25 95% 60%; /* #FF6B35 */
+  --text-secondary: 220 13% 69%; /* #B0B6C3 */
+}
+
+.dark {
+  --background: 15 17% 11%;
+  --foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+  --popover: 15 17% 11%;
+  --popover-foreground: 0 0% 98%;
+  --card: 15 17% 15%;
+  --card-foreground: 0 0% 98%;
+  --border: 0 0% 27%;
+  --input: 0 0% 27%;
+  --primary: 158 64% 52%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 158 64% 52%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 158 64% 52%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-accent-green {
+    color: hsl(var(--accent-green));
+  }
+  
+  .text-accent-blue {
+    color: hsl(var(--accent-blue));
+  }
+  
+  .text-accent-orange {
+    color: hsl(var(--accent-orange));
+  }
+  
+  .text-secondary {
+    color: hsl(var(--text-secondary));
+  }
+  
+  .bg-accent-green {
+    background-color: hsl(var(--accent-green));
+  }
+  
+  .bg-accent-blue {
+    background-color: hsl(var(--accent-blue));
+  }
+  
+  .bg-accent-orange {
+    background-color: hsl(var(--accent-orange));
+  }
+  
+  .border-accent-green {
+    border-color: hsl(var(--accent-green));
+  }
+  
+  .border-accent-blue {
+    border-color: hsl(var(--accent-blue));
+  }
+  
+  .border-accent-orange {
+    border-color: hsl(var(--accent-orange));
+  }
+  
+  .hover\:bg-accent-green:hover {
+    background-color: hsl(var(--accent-green));
+  }
+  
+  .hover\:bg-accent-blue:hover {
+    background-color: hsl(var(--accent-blue));
+  }
+  
+  .hover\:bg-accent-orange:hover {
+    background-color: hsl(var(--accent-orange));
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-bounce-gentle {
+    animation: bounce 1s infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .live-indicator {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    transform: translateX(100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+.bet-slip-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
+}
