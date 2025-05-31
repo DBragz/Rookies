@@ -16,10 +16,10 @@ export default function Header({ user }: HeaderProps) {
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center space-x-4">
           <h1 className="text-2xl font-bold text-accent-blue flex items-center space-x-2">
-            <div className="w-8 h-8 bg-accent-green rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm">▶</span>
+            <div className="w-8 h-8 bg-gradient-green rounded-lg flex items-center justify-center shadow-glow-green">
+              <span className="text-white text-sm font-bold">R</span>
             </div>
-            <span>SportStream</span>
+            <span>Rookies</span>
           </h1>
           <div className="hidden md:flex items-center space-x-2 bg-red-600 px-3 py-1 rounded-full text-sm">
             <div className="w-2 h-2 bg-white rounded-full live-indicator"></div>
