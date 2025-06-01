@@ -113,16 +113,29 @@ export default function StreamsMap() {
   };
 
   return (
-    <div className="h-full relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-      {/* Map Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-green/5 via-transparent to-accent-blue/5"></div>
-      
-      {/* Map Grid */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="grid grid-cols-12 h-full">
-          {Array.from({ length: 144 }).map((_, i) => (
-            <div key={i} className="border border-white/10"></div>
-          ))}
+    <div className="h-full relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+      {/* Map Background with visible pattern */}
+      <div className="absolute inset-0">
+        <div className="w-full h-full bg-gradient-to-br from-accent-green/10 via-accent-blue/5 to-accent-purple/10"></div>
+        {/* Street-like pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+        
+        {/* City landmarks representation */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/4 left-1/3 w-2 h-8 bg-white/20 rounded"></div>
+          <div className="absolute top-1/3 left-1/2 w-3 h-12 bg-white/15 rounded"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-2 h-6 bg-white/20 rounded"></div>
+          <div className="absolute top-1/2 left-1/4 w-4 h-4 bg-accent-blue/30 rounded-full"></div>
+          <div className="absolute bottom-1/4 left-2/3 w-6 h-6 bg-accent-green/20 rounded-full"></div>
         </div>
       </div>
 
@@ -156,26 +169,32 @@ export default function StreamsMap() {
         {mapStreams.map((stream, index) => (
           <div
             key={stream.id}
-            className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300 hover:scale-110 ${
+            className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 ${
               selectedStream?.id === stream.id ? 'scale-125' : ''
             }`}
             style={{
-              left: `${20 + (index * 20)}%`,
-              top: `${30 + (index * 15)}%`
+              left: `${25 + (index * 18)}%`,
+              top: `${25 + (index * 20)}%`,
+              transform: 'translate(-50%, -50%)'
             }}
             onClick={() => handleStreamSelect(stream)}
           >
             {/* Pulse Animation */}
-            <div className={`absolute inset-0 ${getSportColor(stream.sport)} rounded-full animate-ping opacity-30`}></div>
+            <div className={`absolute w-16 h-16 ${getSportColor(stream.sport)} rounded-full animate-ping opacity-20 -inset-2`}></div>
             
             {/* Main Marker */}
-            <div className={`relative w-12 h-12 ${getSportColor(stream.sport)} rounded-full shadow-lg border-2 border-white/30 flex items-center justify-center backdrop-blur-sm`}>
-              <Play className="w-5 h-5 text-white fill-white" />
+            <div className={`relative w-14 h-14 ${getSportColor(stream.sport)} rounded-full shadow-2xl border-3 border-white/50 flex items-center justify-center`}>
+              <Play className="w-6 h-6 text-white fill-white drop-shadow-lg" />
             </div>
             
             {/* Viewer Count Badge */}
-            <div className="absolute -top-2 -right-2 bg-accent-green text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+            <div className="absolute -top-3 -right-3 bg-white text-gray-900 text-xs font-bold px-2 py-1 rounded-full shadow-lg border-2 border-gray-900">
               {stream.viewerCount}
+            </div>
+            
+            {/* Location Label */}
+            <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap">
+              {stream.location.name}
             </div>
           </div>
         ))}
