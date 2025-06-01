@@ -8,10 +8,8 @@ import ChatPanel from "@/components/ChatPanel";
 import BetSlipModal from "@/components/BetSlipModal";
 import NotificationToast from "@/components/NotificationToast";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  const { user } = useAuth();
   const [selectedBet, setSelectedBet] = useState<any>(null);
   const [showBetSlip, setShowBetSlip] = useState(false);
   const [notification, setNotification] = useState<{
@@ -20,7 +18,13 @@ export default function Home() {
     type: 'success' | 'error';
   } | null>(null);
 
-  if (!user) return null;
+  // Mock current user - in real app this would come from auth context
+  const currentUser = {
+    id: 1,
+    username: "Jake_Dunks",
+    balance: "2847.50",
+    avatar: "JD"
+  };
 
   // Mock current stream
   const currentStreamId = 6; // From our seeded data

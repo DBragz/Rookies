@@ -1,32 +1,19 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for authentication
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
+  balance: decimal("balance", { precision: 10, scale: 2 }).notNull().default("0.00"),
   avatar: text("avatar"),
-  balance: decimal("balance", { precision: 10, scale: 2 }).notNull().default("100.00"),
   isOnline: boolean("is_online").notNull().default(false),
   lastSeen: timestamp("last_seen").defaultNow(),
   totalWinnings: decimal("total_winnings", { precision: 10, scale: 2 }).notNull().default("0.00"),
   totalBets: integer("total_bets").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const streams = pgTable("streams", {
@@ -94,20 +81,7 @@ export const gameStats = pgTable("game_stats", {
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
   lastSeen: true,
-});
-
-export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
-export const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  firstName: z.string().min(1).optional(),
-  lastName: z.string().min(1).optional(),
 });
 
 export const insertStreamSchema = createInsertSchema(streams).omit({
@@ -135,8 +109,6 @@ export const insertGameStatsSchema = createInsertSchema(gameStats).omit({
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type LoginData = z.infer<typeof loginSchema>;
-export type SignupData = z.infer<typeof signupSchema>;
 export type Stream = typeof streams.$inferSelect;
 export type InsertStream = z.infer<typeof insertStreamSchema>;
 export type Bet = typeof bets.$inferSelect;

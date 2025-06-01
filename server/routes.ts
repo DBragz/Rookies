@@ -1,123 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import session from "express-session";
-import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
-import { insertBetSchema, insertChatMessageSchema, insertGameStatsSchema, loginSchema, signupSchema } from "@shared/schema";
+import { insertBetSchema, insertChatMessageSchema, insertGameStatsSchema } from "@shared/schema";
 import { z } from "zod";
-
-declare module "express-session" {
-  interface SessionData {
-    userId: number;
-  }
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
-
-  // Session middleware
-  const pgStore = connectPg(session);
-  app.use(session({
-    store: new pgStore({
-      conString: process.env.DATABASE_URL,
-      createTableIfMissing: false,
-    }),
-    secret: process.env.SESSION_SECRET || 'dev-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // Set to true in production with HTTPS
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  }));
-
-  // Authentication middleware
-  const requireAuth = (req: any, res: any, next: any) => {
-    if ((req.session as any)?.userId) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  };
-
-  // Authentication routes
-  app.post('/api/signup', async (req, res) => {
-    try {
-      const data = signupSchema.parse(req.body);
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(data.email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
-
-      const user = await storage.createUser(data);
-      (req.session as any).userId = user.id;
-      
-      res.json({ 
-        id: user.id, 
-        email: user.email, 
-        firstName: user.firstName,
-        lastName: user.lastName,
-        balance: user.balance 
-      });
-    } catch (error) {
-      console.error("Signup error:", error);
-      res.status(400).json({ message: "Invalid signup data" });
-    }
-  });
-
-  app.post('/api/login', async (req, res) => {
-    try {
-      const data = loginSchema.parse(req.body);
-      
-      const user = await storage.verifyUserPassword(data.email, data.password);
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      (req.session as any).userId = user.id;
-      
-      res.json({ 
-        id: user.id, 
-        email: user.email, 
-        firstName: user.firstName,
-        lastName: user.lastName,
-        balance: user.balance 
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(400).json({ message: "Invalid login data" });
-    }
-  });
-
-  app.post('/api/logout', (req, res) => {
-    req.session.destroy(() => {
-      res.json({ message: "Logged out successfully" });
-    });
-  });
-
-  app.get('/api/auth/user', requireAuth, async (req: any, res) => {
-    try {
-      const user = await storage.getUser((req.session as any).userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.json({ 
-        id: user.id, 
-        email: user.email, 
-        firstName: user.firstName,
-        lastName: user.lastName,
-        balance: user.balance 
-      });
-    } catch (error) {
-      console.error("Get user error:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
 
   // WebSocket server setup
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
@@ -178,7 +67,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   };
 
-  // Protected API routes (require authentication)
+  // Auth routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      await storage.updateUserOnlineStatus(user.id, true);
+      res.json({ user: { ...user, password: undefined } });
+    } catch (error) {
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
 
   // User routes
   app.get("/api/users/:id", async (req, res) => {
