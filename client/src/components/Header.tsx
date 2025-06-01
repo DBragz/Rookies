@@ -1,6 +1,7 @@
 import { Bell, Plus, Wallet } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 interface HeaderProps {
   user: {
@@ -11,6 +12,8 @@ interface HeaderProps {
 }
 
 export default function Header({ user }: HeaderProps) {
+  const [, setLocation] = useLocation();
+
   return (
     <header className="bg-glass backdrop-blur-xl border-b border-border/50 px-4 py-3 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-accent-green/5 via-transparent to-accent-blue/5"></div>
@@ -49,14 +52,18 @@ export default function Header({ user }: HeaderProps) {
               </Button>
               <div className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 bg-accent-orange w-2 h-2 md:w-3 md:h-3 rounded-full"></div>
             </div>
-            <div className="flex items-center space-x-1 md:space-x-2">
+            <Button 
+              variant="ghost" 
+              className="flex items-center space-x-1 md:space-x-2 hover:bg-accent-green/10 px-2 py-1 rounded-lg"
+              onClick={() => setLocation('/profile')}
+            >
               <Avatar className="w-8 h-8 md:w-10 md:h-10">
                 <AvatarFallback className="bg-accent-blue text-white text-xs md:text-sm">
                   {user.avatar}
                 </AvatarFallback>
               </Avatar>
               <span className="font-medium text-sm md:text-base hidden sm:inline">{user.username}</span>
-            </div>
+            </Button>
           </div>
         </div>
       </div>
