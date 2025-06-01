@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import FullScreenMap from "@/components/FullScreenMap";
 
 export default function Home() {
   // Mock current user - in real app this would come from auth context
@@ -13,9 +14,9 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <Header user={currentUser} />
       
-      {/* Blank content area */}
+      {/* Full screen map */}
       <div className="h-[calc(100vh-4rem)]">
-        {/* Empty space */}
+        <FullScreenMap />
       </div>
     </div>
   );
