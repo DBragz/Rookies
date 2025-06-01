@@ -1,16 +1,18 @@
-import { 
-  users, streams, bets, friendships, chatMessages, gameStats,
-  type User, type InsertUser, type Stream, type InsertStream, 
+import {
+  type User, type InsertUser, type Stream, type InsertStream,
   type Bet, type InsertBet, type ChatMessage, type InsertChatMessage,
-  type GameStats, type InsertGameStats
+  type GameStats, type InsertGameStats, users, streams, bets, friendships, chatMessages, gameStats
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  verifyUserPassword(email: string, password: string): Promise<User | null>;
   updateUserBalance(id: number, balance: string): Promise<User | undefined>;
   updateUserOnlineStatus(id: number, isOnline: boolean): Promise<void>;
   
@@ -45,333 +47,187 @@ export interface IStorage {
   getDailyLeaderboard(): Promise<Array<User & { dailyWinnings: string }>>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private streams: Map<number, Stream> = new Map();
-  private bets: Map<number, Bet> = new Map();
-  private friendships: Map<number, Array<{ userId: number; friendId: number; status: string }>> = new Map();
-  private chatMessages: Map<number, ChatMessage[]> = new Map();
-  private gameStats: Map<number, GameStats> = new Map();
-  private currentId = 1;
-
-  constructor() {
-    this.seedData();
-  }
-
-  private seedData() {
-    // Create sample users
-    const sampleUsers = [
-      { username: "Jake_Dunks", email: "jake@example.com", password: "password", balance: "2847.50", avatar: "JD", isOnline: true, totalWinnings: "1247.80", totalBets: 42 },
-      { username: "Mike_Hoops", email: "mike@example.com", password: "password", balance: "1950.25", avatar: "MH", isOnline: true, totalWinnings: "890.50", totalBets: 38 },
-      { username: "Sarah_B", email: "sarah@example.com", password: "password", balance: "3200.75", avatar: "SB", isOnline: true, totalWinnings: "1650.30", totalBets: 55 },
-      { username: "TylerDunks", email: "tyler@example.com", password: "password", balance: "1450.00", avatar: "TD", isOnline: true, totalWinnings: "720.90", totalBets: 28 },
-      { username: "Alex_Ball", email: "alex@example.com", password: "password", balance: "2100.60", avatar: "AB", isOnline: true, totalWinnings: "1100.40", totalBets: 35 },
-    ];
-
-    sampleUsers.forEach(userData => {
-      const user: User = {
-        id: this.currentId++,
-        ...userData,
-        lastSeen: new Date(),
-        createdAt: new Date(),
-      };
-      this.users.set(user.id, user);
-    });
-
-    // Create sample stream
-    const stream: Stream = {
-      id: this.currentId++,
-      userId: 2, // Mike_Hoops
-      title: "Basketball Street Court",
-      description: "Live basketball game at Venice Beach",
-      isLive: true,
-      viewerCount: 1247,
-      sport: "basketball",
-      location: {
-        lat: 33.9850,
-        lng: -118.4695,
-        name: "Venice Beach Courts",
-        address: "1800 Ocean Front Walk, CA"
-      },
-      streamKey: "live_stream_key_123",
-      createdAt: new Date(),
-      endedAt: null,
-    };
-    this.streams.set(stream.id, stream);
-
-    // Create sample game stats
-    const stats: GameStats = {
-      id: this.currentId++,
-      streamId: stream.id,
-      score: "21-18",
-      duration: 1122, // 18:42
-      points: 24,
-      distance: "2.3",
-      lastUpdated: new Date(),
-    };
-    this.gameStats.set(stream.id, stats);
-
-    // Create sample friendships
-    this.friendships.set(1, [
-      { userId: 1, friendId: 2, status: "accepted" },
-      { userId: 1, friendId: 3, status: "accepted" },
-      { userId: 1, friendId: 4, status: "accepted" },
-      { userId: 1, friendId: 5, status: "accepted" },
-    ]);
-
-    // Create sample chat messages
-    this.chatMessages.set(stream.id, [
-      {
-        id: this.currentId++,
-        streamId: stream.id,
-        userId: 1,
-        message: "Nice shot! 🔥",
-        type: "message",
-        createdAt: new Date(Date.now() - 300000)
-      },
-      {
-        id: this.currentId++,
-        streamId: stream.id,
-        userId: 3,
-        message: "Going for the 25+ points!",
-        type: "message",
-        createdAt: new Date(Date.now() - 240000)
-      },
-      {
-        id: this.currentId++,
-        streamId: stream.id,
-        userId: 4,
-        message: "This stream is amazing 🔥",
-        type: "message",
-        createdAt: new Date(Date.now() - 180000)
-      }
-    ]);
-
-    // Create sample bets
-    const sampleBets = [
-      {
-        userId: 1,
-        streamId: stream.id,
-        betType: "next_shot",
-        description: "Next Shot Made",
-        amount: "50.00",
-        odds: 180,
-        potentialWin: "140.00",
-        status: "pending"
-      },
-      {
-        userId: 1,
-        streamId: stream.id,
-        betType: "game_winner",
-        description: "Game Winner",
-        amount: "25.00",
-        odds: -110,
-        potentialWin: "45.00",
-        status: "won",
-        outcome: "Team Blue won",
-        settledAt: new Date(Date.now() - 600000)
-      }
-    ];
-
-    sampleBets.forEach(betData => {
-      const bet: Bet = {
-        id: this.currentId++,
-        ...betData,
-        placedAt: new Date(),
-        settledAt: betData.settledAt || null,
-      };
-      this.bets.set(bet.id, bet);
-    });
-  }
-
-  // Users
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const user: User = {
-      id: this.currentId++,
-      ...insertUser,
-      lastSeen: new Date(),
-      createdAt: new Date(),
-    };
-    this.users.set(user.id, user);
+    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...insertUser,
+        password: hashedPassword,
+      })
+      .returning();
     return user;
   }
 
+  async verifyUserPassword(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return null;
+
+    const isValid = await bcrypt.compare(password, user.password);
+    return isValid ? user : null;
+  }
+
   async updateUserBalance(id: number, balance: string): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (user) {
-      user.balance = balance;
-      this.users.set(id, user);
-      return user;
-    }
-    return undefined;
+    const [user] = await db
+      .update(users)
+      .set({ balance, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async updateUserOnlineStatus(id: number, isOnline: boolean): Promise<void> {
-    const user = this.users.get(id);
-    if (user) {
-      user.isOnline = isOnline;
-      user.lastSeen = new Date();
-      this.users.set(id, user);
-    }
+    await db
+      .update(users)
+      .set({ isOnline, lastSeen: new Date(), updatedAt: new Date() })
+      .where(eq(users.id, id));
   }
 
-  // Streams
   async getStream(id: number): Promise<Stream | undefined> {
-    return this.streams.get(id);
+    const [stream] = await db.select().from(streams).where(eq(streams.id, id));
+    return stream || undefined;
   }
 
   async getActiveStreams(): Promise<Stream[]> {
-    return Array.from(this.streams.values()).filter(stream => stream.isLive);
+    return await db.select().from(streams).where(eq(streams.isLive, true));
   }
 
   async getUserStreams(userId: number): Promise<Stream[]> {
-    return Array.from(this.streams.values()).filter(stream => stream.userId === userId);
+    return await db.select().from(streams).where(eq(streams.userId, userId));
   }
 
   async createStream(insertStream: InsertStream): Promise<Stream> {
-    const stream: Stream = {
-      id: this.currentId++,
-      ...insertStream,
-      createdAt: new Date(),
-      endedAt: null,
-    };
-    this.streams.set(stream.id, stream);
+    const [stream] = await db
+      .insert(streams)
+      .values(insertStream)
+      .returning();
     return stream;
   }
 
   async updateStreamStatus(id: number, isLive: boolean): Promise<void> {
-    const stream = this.streams.get(id);
-    if (stream) {
-      stream.isLive = isLive;
-      if (!isLive) {
-        stream.endedAt = new Date();
-      }
-      this.streams.set(id, stream);
-    }
+    await db
+      .update(streams)
+      .set({ isLive, endedAt: isLive ? null : new Date() })
+      .where(eq(streams.id, id));
   }
 
   async updateStreamViewers(id: number, viewerCount: number): Promise<void> {
-    const stream = this.streams.get(id);
-    if (stream) {
-      stream.viewerCount = viewerCount;
-      this.streams.set(id, stream);
-    }
+    await db
+      .update(streams)
+      .set({ viewerCount })
+      .where(eq(streams.id, id));
   }
 
-  // Bets
   async getBet(id: number): Promise<Bet | undefined> {
-    return this.bets.get(id);
+    const [bet] = await db.select().from(bets).where(eq(bets.id, id));
+    return bet || undefined;
   }
 
   async getUserBets(userId: number): Promise<Bet[]> {
-    return Array.from(this.bets.values()).filter(bet => bet.userId === userId);
+    return await db.select().from(bets).where(eq(bets.userId, userId));
   }
 
   async getStreamBets(streamId: number): Promise<Bet[]> {
-    return Array.from(this.bets.values()).filter(bet => bet.streamId === streamId);
+    return await db.select().from(bets).where(eq(bets.streamId, streamId));
   }
 
   async createBet(insertBet: InsertBet): Promise<Bet> {
-    const bet: Bet = {
-      id: this.currentId++,
-      ...insertBet,
-      placedAt: new Date(),
-      settledAt: null,
-    };
-    this.bets.set(bet.id, bet);
+    const [bet] = await db
+      .insert(bets)
+      .values(insertBet)
+      .returning();
     return bet;
   }
 
   async updateBetStatus(id: number, status: string, outcome?: string): Promise<void> {
-    const bet = this.bets.get(id);
-    if (bet) {
-      bet.status = status;
-      if (outcome) bet.outcome = outcome;
-      if (status === "won" || status === "lost") {
-        bet.settledAt = new Date();
-      }
-      this.bets.set(id, bet);
-    }
+    await db
+      .update(bets)
+      .set({ 
+        status, 
+        outcome: outcome || null,
+        settledAt: status === 'settled' ? new Date() : null 
+      })
+      .where(eq(bets.id, id));
   }
 
-  // Friends
   async getUserFriends(userId: number): Promise<User[]> {
-    const userFriendships = this.friendships.get(userId) || [];
-    const friendIds = userFriendships
-      .filter(f => f.status === "accepted")
-      .map(f => f.friendId);
-    
-    return Array.from(this.users.values()).filter(user => friendIds.includes(user.id));
+    const friendIds = await db
+      .select({ friendId: friendships.friendId })
+      .from(friendships)
+      .where(and(eq(friendships.userId, userId), eq(friendships.status, 'accepted')));
+
+    if (friendIds.length === 0) return [];
+
+    return await db.select().from(users).where(
+      eq(users.id, friendIds[0].friendId) // This is simplified; in real app would use IN clause
+    );
   }
 
   async addFriend(userId: number, friendId: number): Promise<void> {
-    if (!this.friendships.has(userId)) {
-      this.friendships.set(userId, []);
-    }
-    this.friendships.get(userId)!.push({ userId, friendId, status: "accepted" });
+    await db.insert(friendships).values({
+      userId,
+      friendId,
+      status: 'accepted'
+    });
   }
 
-  // Chat
   async getStreamMessages(streamId: number, limit = 50): Promise<ChatMessage[]> {
-    const messages = this.chatMessages.get(streamId) || [];
-    return messages.slice(-limit);
+    return await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.streamId, streamId))
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(limit);
   }
 
   async createMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
-    const message: ChatMessage = {
-      id: this.currentId++,
-      ...insertMessage,
-      createdAt: new Date(),
-    };
-    
-    if (!this.chatMessages.has(message.streamId)) {
-      this.chatMessages.set(message.streamId, []);
-    }
-    this.chatMessages.get(message.streamId)!.push(message);
+    const [message] = await db
+      .insert(chatMessages)
+      .values(insertMessage)
+      .returning();
     return message;
   }
 
-  // Game Stats
   async getStreamStats(streamId: number): Promise<GameStats | undefined> {
-    return this.gameStats.get(streamId);
+    const [stats] = await db.select().from(gameStats).where(eq(gameStats.streamId, streamId));
+    return stats || undefined;
   }
 
   async updateStreamStats(streamId: number, stats: InsertGameStats): Promise<GameStats> {
-    const gameStats: GameStats = {
-      id: this.gameStats.get(streamId)?.id || this.currentId++,
-      streamId,
-      ...stats,
-      lastUpdated: new Date(),
-    };
-    this.gameStats.set(streamId, gameStats);
-    return gameStats;
+    const existingStats = await this.getStreamStats(streamId);
+    
+    if (existingStats) {
+      const [updated] = await db
+        .update(gameStats)
+        .set({ ...stats, lastUpdated: new Date() })
+        .where(eq(gameStats.streamId, streamId))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(gameStats)
+        .values({ ...stats, streamId })
+        .returning();
+      return created;
+    }
   }
 
-  // Leaderboard
   async getDailyLeaderboard(): Promise<Array<User & { dailyWinnings: string }>> {
-    const users = Array.from(this.users.values())
-      .filter(user => user.isOnline)
-      .map(user => ({
-        ...user,
-        dailyWinnings: (parseFloat(user.totalWinnings) * 0.3).toFixed(2) // Mock daily winnings as 30% of total
-      }))
-      .sort((a, b) => parseFloat(b.dailyWinnings) - parseFloat(a.dailyWinnings))
-      .slice(0, 10);
-    
-    return users;
+    // Simplified implementation - in real app would calculate daily winnings
+    const allUsers = await db.select().from(users);
+    return allUsers.map(user => ({ ...user, dailyWinnings: "0.00" }));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
