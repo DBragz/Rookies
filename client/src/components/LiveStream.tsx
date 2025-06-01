@@ -55,61 +55,61 @@ export default function LiveStream({ streamId }: LiveStreamProps) {
         {/* Stream Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40">
           {/* Top Overlay */}
-          <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
-            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
-              <div className="flex items-center space-x-3 text-sm mb-2">
-                <div className="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 px-3 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-                  <span className="font-bold text-white">LIVE</span>
+          <div className="absolute top-3 md:top-6 left-3 md:left-6 right-3 md:right-6 flex justify-between items-start">
+            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-3 md:p-4 shadow-2xl max-w-xs md:max-w-none">
+              <div className="flex items-center space-x-2 md:space-x-3 text-xs md:text-sm mb-1 md:mb-2">
+                <div className="flex items-center space-x-1 md:space-x-2 bg-gradient-to-r from-red-500 to-red-600 px-2 md:px-3 py-1 rounded-full">
+                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full animate-ping"></div>
+                  <span className="font-bold text-white text-xs md:text-sm">LIVE</span>
                 </div>
-                <div className="flex items-center space-x-2 text-white/80">
-                  <Eye className="w-4 h-4" />
-                  <span className="font-medium">{stream?.viewerCount || 1247}</span>
+                <div className="flex items-center space-x-1 md:space-x-2 text-white/80">
+                  <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="font-medium text-xs md:text-sm">{stream?.viewerCount || 1247}</span>
                 </div>
               </div>
               <div>
-                <div className="font-bold text-lg text-white">{stream?.title || "Basketball at Downtown Court"}</div>
-                <div className="text-sm text-white/70">{stream?.location?.name || "Manhattan, NYC"}</div>
+                <div className="font-bold text-sm md:text-lg text-white line-clamp-1">{stream?.title || "Basketball at Downtown Court"}</div>
+                <div className="text-xs md:text-sm text-white/70 line-clamp-1">{stream?.location?.name || "Manhattan, NYC"}</div>
               </div>
             </Card>
             
-            <div className="flex space-x-2">
-              <Button size="icon" className="bg-black/70 backdrop-blur-sm hover:bg-black/80 border-0">
-                <Expand className="w-5 h-5" />
+            <div className="flex space-x-1 md:space-x-2">
+              <Button size="icon" className="bg-black/70 backdrop-blur-sm hover:bg-black/80 border-0 w-8 h-8 md:w-10 md:h-10">
+                <Expand className="w-4 h-4 md:w-5 md:h-5" />
               </Button>
-              <Button size="icon" className="bg-black/70 backdrop-blur-sm hover:bg-black/80 border-0">
-                <Settings className="w-5 h-5" />
+              <Button size="icon" className="bg-black/70 backdrop-blur-sm hover:bg-black/80 border-0 w-8 h-8 md:w-10 md:h-10 hidden md:flex">
+                <Settings className="w-4 h-4 md:w-5 md:h-5" />
               </Button>
             </div>
           </div>
           
           {/* Bottom Overlay - Stats */}
-          <div className="absolute bottom-6 left-6 right-6">
-            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-6 shadow-2xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-8">
+          <div className="absolute bottom-3 md:bottom-6 left-3 md:left-6 right-3 md:right-6">
+            <Card className="bg-glass backdrop-blur-xl border border-white/10 p-4 md:p-6 shadow-2xl">
+              <div className="flex items-center justify-between flex-col md:flex-row space-y-4 md:space-y-0">
+                <div className="flex items-center justify-center space-x-4 md:space-x-8 w-full md:w-auto">
                   <div className="text-center transform hover:scale-110 transition-all duration-300">
-                    <div className="text-3xl font-black text-accent-green mb-1">{stats.points}</div>
+                    <div className="text-xl md:text-3xl font-black text-accent-green mb-0.5 md:mb-1">{stats.points}</div>
                     <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Points</div>
                   </div>
                   <div className="text-center transform hover:scale-110 transition-all duration-300">
-                    <div className="text-3xl font-black text-accent-blue mb-1">{stats.time}</div>
+                    <div className="text-xl md:text-3xl font-black text-accent-blue mb-0.5 md:mb-1">{stats.time}</div>
                     <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Duration</div>
                   </div>
                   <div className="text-center transform hover:scale-110 transition-all duration-300">
-                    <div className="text-3xl font-black text-accent-orange mb-1">{stats.distance}</div>
+                    <div className="text-xl md:text-3xl font-black text-accent-orange mb-0.5 md:mb-1">{stats.distance}</div>
                     <div className="text-xs text-white/70 font-medium uppercase tracking-wider">Miles</div>
                   </div>
                 </div>
                 
-                <div className="flex space-x-3">
-                  <Button className="bg-gradient-green hover:shadow-glow-green text-white font-semibold px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
-                    <DollarSign className="w-5 h-5 mr-2" />
-                    Quick Bet
+                <div className="flex space-x-2 md:space-x-3 w-full md:w-auto">
+                  <Button className="bg-gradient-green hover:shadow-glow-green text-white font-semibold px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl transform hover:scale-105 transition-all duration-300 flex-1 md:flex-none">
+                    <DollarSign className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+                    <span className="hidden md:inline">Quick Bet</span>
                   </Button>
-                  <Button className="bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue text-white font-semibold px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
-                    <Share2 className="w-5 h-5 mr-2" />
-                    Share
+                  <Button className="bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue text-white font-semibold px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl transform hover:scale-105 transition-all duration-300 flex-1 md:flex-none">
+                    <Share2 className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+                    <span className="hidden md:inline">Share</span>
                   </Button>
                 </div>
               </div>

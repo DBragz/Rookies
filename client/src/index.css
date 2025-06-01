@@ -176,6 +176,17 @@
   .live-indicator {
     animation: pulse 2s infinite;
   }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
 }
 
 @keyframes fadeIn {

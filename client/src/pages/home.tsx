@@ -53,7 +53,8 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <Header user={currentUser} />
       
-      <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Desktop Layout */}
+      <div className="hidden md:flex h-[calc(100vh-4rem)] overflow-hidden">
         {/* Friends Panel - Hidden on mobile/tablet */}
         <div className="hidden lg:block w-80">
           <FriendsPanel />
@@ -92,6 +93,42 @@ export default function Home() {
             onSendMessage={handleSendMessage}
             isConnected={isConnected}
           />
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="md:hidden h-[calc(100vh-4rem)] flex flex-col">
+        {/* Video Stream - Takes most of the screen on mobile */}
+        <div className="flex-1 bg-black relative min-h-[50vh]">
+          <LiveStream streamId={currentStreamId} />
+        </div>
+        
+        {/* Mobile Bottom Panel with Tabs */}
+        <div className="h-[40vh] bg-card border-t border-border flex flex-col">
+          {/* Tab Navigation */}
+          <div className="flex bg-muted border-b border-border">
+            <button className="flex-1 px-4 py-3 text-sm font-semibold bg-accent-green text-white">
+              Bets
+            </button>
+            <button className="flex-1 px-4 py-3 text-sm font-semibold text-secondary hover:text-foreground">
+              Map
+            </button>
+            <button className="flex-1 px-4 py-3 text-sm font-semibold text-secondary hover:text-foreground">
+              Chat
+            </button>
+            <button className="flex-1 px-4 py-3 text-sm font-semibold text-secondary hover:text-foreground">
+              Friends
+            </button>
+          </div>
+          
+          {/* Tab Content */}
+          <div className="flex-1 overflow-hidden">
+            <BettingPanel 
+              streamId={currentStreamId} 
+              userId={currentUser.id}
+              onPlaceBet={handlePlaceBet}
+            />
+          </div>
         </div>
       </div>
 

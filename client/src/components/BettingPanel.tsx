@@ -80,19 +80,19 @@ export default function BettingPanel({ streamId, userId, onPlaceBet }: BettingPa
   const pendingBets = userBets?.filter((bet: any) => bet.status === 'pending') || [];
 
   return (
-    <div className="h-full bg-glass backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar relative">
+    <div className="h-full bg-glass backdrop-blur-xl p-3 md:p-6 overflow-y-auto custom-scrollbar relative">
       <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 via-transparent to-accent-orange/5 pointer-events-none"></div>
-      <div className="space-y-6 relative z-10">
+      <div className="space-y-4 md:space-y-6 relative z-10">
         {/* Active Bets */}
         <Card className="bg-glass backdrop-blur-sm border-accent-green/20 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-bold flex items-center space-x-3">
-              <div className="p-2 bg-gradient-green rounded-lg shadow-glow-green">
-                <TrendingUp className="w-5 h-5 text-white" />
+            <CardTitle className="text-lg md:text-xl font-bold flex items-center space-x-2 md:space-x-3">
+              <div className="p-1.5 md:p-2 bg-gradient-green rounded-lg shadow-glow-green">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <span className="text-accent-green">Live Bets</span>
-              <span className="bg-accent-green/20 text-accent-green text-sm px-3 py-1 rounded-full font-semibold">
-                {pendingBets.length} active
+              <span className="bg-accent-green/20 text-accent-green text-xs md:text-sm px-2 md:px-3 py-1 rounded-full font-semibold">
+                {pendingBets.length}
               </span>
             </CardTitle>
           </CardHeader>
@@ -139,16 +139,16 @@ export default function BettingPanel({ streamId, userId, onPlaceBet }: BettingPa
               <Button
                 key={index}
                 variant="ghost"
-                className="w-full bg-gradient-to-r from-muted/50 to-muted/30 hover:from-accent-green/10 hover:to-accent-blue/10 rounded-xl p-4 h-auto border border-border/50 hover:border-accent-green/50 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-glow-green"
+                className="w-full bg-gradient-to-r from-muted/50 to-muted/30 hover:from-accent-green/10 hover:to-accent-blue/10 rounded-lg md:rounded-xl p-3 md:p-4 h-auto border border-border/50 hover:border-accent-green/50 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-glow-green touch-manipulation"
                 onClick={() => handlePlaceBet(option)}
                 disabled={placeBetMutation.isPending}
               >
                 <div className="flex items-center justify-between w-full">
-                  <div className="text-left">
-                    <div className="font-semibold text-base">{option.description}</div>
-                    <div className="text-sm text-secondary">{option.details}</div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="font-semibold text-sm md:text-base truncate">{option.description}</div>
+                    <div className="text-xs md:text-sm text-secondary line-clamp-1">{option.details}</div>
                   </div>
-                  <div className={`font-black text-xl ${
+                  <div className={`font-black text-lg md:text-xl ml-2 ${
                     option.odds > 0 ? 'text-accent-green' : 'text-accent-blue'
                   }`}>
                     {option.odds > 0 ? '+' : ''}{option.odds}
