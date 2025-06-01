@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Header from "@/components/Header";
-import LiveStream from "@/components/LiveStream";
-import InteractiveMap from "@/components/InteractiveMap";
+import StreamsMap from "@/components/StreamsMap";
 import BettingPanel from "@/components/BettingPanel";
 import FriendsPanel from "@/components/FriendsPanel";
 import ChatPanel from "@/components/ChatPanel";
@@ -61,27 +60,19 @@ export default function Home() {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          {/* Video Stream */}
+        <main className="flex-1 flex overflow-hidden">
+          {/* Main Map View */}
           <div className="flex-1 bg-black relative">
-            <LiveStream streamId={currentStreamId} />
+            <StreamsMap />
           </div>
           
-          {/* Map and Betting Section */}
-          <div className="h-80 flex bg-card border-t border-border">
-            {/* Interactive Map */}
-            <div className="flex-1">
-              <InteractiveMap streamId={currentStreamId} />
-            </div>
-            
-            {/* Betting Panel */}
-            <div className="w-96 border-l border-border">
-              <BettingPanel 
-                streamId={currentStreamId} 
-                userId={currentUser.id}
-                onPlaceBet={handlePlaceBet}
-              />
-            </div>
+          {/* Betting Panel */}
+          <div className="w-96 border-l border-border">
+            <BettingPanel 
+              streamId={currentStreamId} 
+              userId={currentUser.id}
+              onPlaceBet={handlePlaceBet}
+            />
           </div>
         </main>
 
@@ -98,20 +89,17 @@ export default function Home() {
 
       {/* Mobile Layout */}
       <div className="md:hidden h-[calc(100vh-4rem)] flex flex-col">
-        {/* Video Stream - Takes most of the screen on mobile */}
-        <div className="flex-1 bg-black relative min-h-[50vh]">
-          <LiveStream streamId={currentStreamId} />
+        {/* Map - Takes most of the screen on mobile */}
+        <div className="flex-1 bg-black relative min-h-[60vh]">
+          <StreamsMap />
         </div>
         
         {/* Mobile Bottom Panel with Tabs */}
-        <div className="h-[40vh] bg-card border-t border-border flex flex-col">
+        <div className="h-[30vh] bg-card border-t border-border flex flex-col">
           {/* Tab Navigation */}
           <div className="flex bg-muted border-b border-border">
             <button className="flex-1 px-4 py-3 text-sm font-semibold bg-accent-green text-white">
               Bets
-            </button>
-            <button className="flex-1 px-4 py-3 text-sm font-semibold text-secondary hover:text-foreground">
-              Map
             </button>
             <button className="flex-1 px-4 py-3 text-sm font-semibold text-secondary hover:text-foreground">
               Chat
