@@ -187,6 +187,34 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
   }
+  
+  /* Custom marker styles */
+  .custom-marker {
+    background: none !important;
+    border: none !important;
+  }
+  
+  /* Leaflet control styling */
+  .leaflet-control-layers {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .leaflet-control-layers-toggle {
+    background-color: rgba(16, 185, 129, 0.9) !important;
+    background-image: none !important;
+    border-radius: 8px !important;
+    color: white !important;
+    font-weight: bold !important;
+  }
+  
+  .leaflet-control-layers-toggle:after {
+    content: "🗺️";
+    font-size: 16px;
+  }
 }
 
 @keyframes fadeIn {
